@@ -1,0 +1,21 @@
+{
+  "tasks": {
+    "dev": "deno serve --allow-env --allow-net --allow-read --allow-write --env-file --watch ./server.tsx",
+    "start": "deno serve --allow-env --allow-net --allow-read --allow-write --env-file ./server.tsx"
+  },
+  "imports": {
+    "hono": "jsr:@hono/hono@^4.7.5"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "hono/jsx"
+  },
+  "lock": false,
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 120,
+    "indentWidth": 2,
+    "semiColons": false,
+    "singleQuote": true
+  }
+}

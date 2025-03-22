@@ -1,0 +1,6 @@
+{
+  "recommendations": [
+    "denoland.vscode-deno",
+    "styled-components.vscode-styled-components"
+  ]
+}

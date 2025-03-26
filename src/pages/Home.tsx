@@ -1,21 +1,26 @@
-import { html } from 'hono/html'
-import type { FC } from 'hono/jsx'
+import { Context } from 'hono'
+import { addUrl } from '../database/database.ts'
+import { BASE_URL, toShortId } from '../helpers.ts'
 
-const Layout: FC = ({ children }) =>
-  html`<!DOCTYPE html>
-<html lang='en'>
-  <head>
-    <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>Document</title>
-  </head>
-  <body>
-    ${children}
-  </body>
-</html>`
+const Home = () => {
+  const snippet =
+    `javascript:(()=>{window.open('${BASE_URL}/?origin='+encodeURIComponent(window.location),'_blank')})()`
 
-export const Home = () => (
-  <Layout>
-    Hello Word
-  </Layout>
-)
+  return (
+    <form action={BASE_URL}>
+      <input type='url' name='origin' /> <button type='submit'>shorten</button> or <a href={snippet}>Bookmarklet</a>
+    </form>
+  )
+}
+
+const entry = (ctx: Context) => {
+  const { origin } = ctx.req.query()
+  if (origin) {
+    const data = addUrl(origin)
+    return ctx.text(`${BASE_URL}/${toShortId(data.id)}`)
+  }
+
+  return ctx.render(<Home />)
+}
+
+export default entry

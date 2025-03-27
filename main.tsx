@@ -1,6 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { css, Style } from 'hono/css'
+import { css, keyframes, Style } from 'hono/css'
 import { html } from 'hono/html'
 import { FC } from 'hono/jsx'
 import { DatabaseSync } from 'node:sqlite'
@@ -99,6 +99,28 @@ app.get('/', (ctx) => {
     return ctx.text(`${BASE_URL}/${toShortId(data.id)}`, 201)
   }
 
+  const waveAnimation = keyframes`
+    0%, 100% { transform: rotate(0); }
+    20%, 60% { transform: rotate(-25deg); }
+    40%, 80% { transform: rotate(10deg); }
+  `
+
+  const octocatCss = css`
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5em;
+    height: 5em;
+
+    .arm {
+      transform-origin: 130px 106px;
+    }
+
+    &:hover .arm {
+      animation: ${waveAnimation} 560ms ease-in-out;
+    }
+  `
+
   const headingCss = css`
     font-size: 10em;
     margin: 20dvh 0 0;
@@ -130,6 +152,20 @@ app.get('/', (ctx) => {
 
   return ctx.render(
     <Layout>
+      <a class={octocatCss} href="//github.com/fabricionaweb/fabricio.gay">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250">
+          <path fill="#ff6ce9" d="m0 0 115 115h15l12 27 108 108V0z" />
+          <path
+            fill="#fff"
+            class="arm"
+            d="M128 109c-15-9-9-19-9-19 3-7 2-11 2-11-1-7 3-2 3-2 4 5 2 11 2 11-3 10 5 15 9 16"
+          />
+          <path
+            fill="#fff"
+            d="M115 115s4 2 5 0l14-14c3-2 6-3 8-3-8-11-15-24 2-41 5-5 10-7 16-7 1-2 3-7 12-11 0 0 5 3 7 16 4 2 8 5 12 9s7 8 9 12c14 3 17 7 17 7-4 8-9 11-11 11 0 6-2 11-7 16-16 16-30 10-41 2 0 3-1 7-5 11l-12 11c-1 1 1 5 1 5z"
+          />
+        </svg>
+      </a>
       <h1 class={headingCss}>🏳️‍🌈</h1>
       <form class={formCss} action="/">
         <input type="url" name="origin" placeholder="https://..." />

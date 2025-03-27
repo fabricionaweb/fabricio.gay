@@ -18,7 +18,7 @@ interface UrlSchema {
 db.exec(`
   CREATE TABLE IF NOT EXISTS wardrobe (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    url TEXT NOT NULL,
+    url TEXT NOT NULL UNIQUE,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
   )`)
 

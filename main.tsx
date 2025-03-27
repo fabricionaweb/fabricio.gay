@@ -83,10 +83,11 @@ const Layout: FC = ({ children }) => (
 /** APP **/
 const app = new Hono({ strict: false })
 
-app.get('/:shortId{[0-9a-z]+}', (ctx) => {
-  const { shortId } = ctx.req.param()
+app.get('/:shortId{[0-9a-z]+}/:raw?', (ctx) => {
+  const { shortId, raw } = ctx.req.param()
   const data = getUrlById(fromShortId(shortId))
-  return !data ? ctx.notFound() : ctx.redirect(data.url)
+  if (!data) return ctx.notFound()
+  return !raw ? ctx.redirect(data.url) : ctx.text(data.url)
 })
 
 app.get('/', (ctx) => {

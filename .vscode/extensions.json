@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "denoland.vscode-deno",
+    "esbenp.prettier-vscode",
     "styled-components.vscode-styled-components"
   ]
 }

@@ -1,6 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { Style } from 'hono/css'
+import { css, Style } from 'hono/css'
 import { html } from 'hono/html'
 import { FC } from 'hono/jsx'
 import { DatabaseSync } from 'node:sqlite'
@@ -50,10 +50,30 @@ const Layout: FC = ({ children }) => (
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
           rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👕</text></svg>"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏳️‍🌈</text></svg>"
         />
         <title>URL Shortener</title>
-        <Style />
+        <Style>
+          {css`
+            html {
+              height: 100%;
+              font: 14px/1.5 system-ui;
+            }
+
+            body {
+              min-height: 100%;
+              margin: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+
+            * {
+              box-sizing: border-box;
+              font-size: 1em;
+            }
+          `}
+        </Style>
       </head>
       <body>{children}</body>
     </html>
@@ -79,11 +99,45 @@ app.get('/', (ctx) => {
     return ctx.text(`${BASE_URL}/${toShortId(data.id)}`, 201)
   }
 
+  const headingCss = css`
+    font-size: 10em;
+    margin: 20dvh 0 0;
+    user-select: none;
+  `
+  const formCss = css`
+    display: flex;
+    width: 100%;
+    padding: 0 1.5em;
+    margin: 2.5em 0;
+    max-width: 32em;
+
+    input,
+    button {
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      padding: 0.5em;
+    }
+
+    input {
+      width: 100%;
+    }
+
+    button {
+      cursor: pointer;
+      margin-left: -1px;
+      white-space: nowrap;
+    }
+  `
+
   return ctx.render(
     <Layout>
-      <form action={BASE_URL}>
-        <input type="url" name="origin" /> <button type="submit">shorten</button> or <a href={snippet}>Bookmarklet</a>
+      <h1 class={headingCss}>🏳️‍🌈</h1>
+      <form class={formCss} action={BASE_URL}>
+        <input type="url" name="origin" placeholder="https://..." />
+        <button type="submit">👉👈</button>
       </form>
+      <footer>
+        or drag the <a href={snippet}>bookmarklet</a>
+      </footer>
     </Layout>
   )
 })

@@ -1,10 +1,12 @@
+import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { Style } from 'hono/css'
+import { html } from 'hono/html'
 import { FC } from 'hono/jsx'
 import { DatabaseSync } from 'node:sqlite'
 
 /** DATABASE **/
-const db = new DatabaseSync(Deno.env.get('DB_FILE') ?? ':memory:')
+const db = new DatabaseSync(process.env.DB_FILE ?? ':memory:')
 
 interface UrlSchema {
   id: number
@@ -40,15 +42,15 @@ const fromShortId = (id: string) => parseInt(id, 36)
 /** HTML **/
 const Layout: FC = ({ children }) => (
   <>
-    {/* escape doctype under string to bypass jsx */}
-    {'<!DOCTYPE html>'}
-    <html lang='en'>
+    {/* escape jsx doctype */}
+    {html`<!DOCTYPE html>`}
+    <html lang="en">
       <head>
-        <meta charset='UTF-8' />
-        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
-          rel='icon'
-          href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👕</text></svg>'
+          rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👕</text></svg>"
         />
         <title>URL Shortener</title>
         <Style />
@@ -60,8 +62,6 @@ const Layout: FC = ({ children }) => (
 
 /** APP **/
 const app = new Hono({ strict: false })
-// uncomment if needed
-// app.use('/static/*', serveStatic({ root: './' }))
 
 app.get('/:shortId{[0-9a-z]+}', (ctx) => {
   const { shortId } = ctx.req.param()
@@ -71,9 +71,8 @@ app.get('/:shortId{[0-9a-z]+}', (ctx) => {
 
 app.get('/', (ctx) => {
   const { origin } = ctx.req.query()
-  const BASE_URL = Deno.env.get('BASE_URL')
-  const snippet =
-    `javascript:(()=>{window.open('${BASE_URL}/?origin='+encodeURIComponent(window.location),'_blank')})()`
+  const BASE_URL = process.env.BASE_URL
+  const snippet = `javascript:(()=>{window.open('${BASE_URL}/?origin='+encodeURIComponent(window.location),'_blank')})()`
 
   if (origin) {
     const data = getUrlByUrl(origin) ?? addUrl(origin)
@@ -83,11 +82,10 @@ app.get('/', (ctx) => {
   return ctx.render(
     <Layout>
       <form action={BASE_URL}>
-        <input type='url' name='origin' /> <button type='submit'>shorten</button> or <a href={snippet}>Bookmarklet</a>
+        <input type="url" name="origin" /> <button type="submit">shorten</button> or <a href={snippet}>Bookmarklet</a>
       </form>
-    </Layout>,
+    </Layout>
   )
 })
 
-// default to use with `deno serve`
-export default app
+serve({ port: 8000, fetch: app.fetch })

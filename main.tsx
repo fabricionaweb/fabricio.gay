@@ -142,4 +142,4 @@ app.get('/', (ctx) => {
   )
 })
 
-serve({ port: 8000, fetch: app.fetch })
+serve({ port: Number(process.env.PORT), fetch: app.fetch })

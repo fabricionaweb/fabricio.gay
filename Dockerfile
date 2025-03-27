@@ -10,7 +10,7 @@ RUN apk add --no-cache tzdata tini && \
 COPY main.tsx ./
 
 USER node
-ENV PORT=3000 DB_PATH=/data/shorts.db
+ENV PORT=8000 DB_PATH=/data/shorts.db
 ENV BASE_URL=https://fabricio.gay
 
 EXPOSE 8000

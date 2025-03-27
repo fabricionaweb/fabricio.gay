@@ -131,7 +131,7 @@ app.get('/', (ctx) => {
   return ctx.render(
     <Layout>
       <h1 class={headingCss}>🏳️‍🌈</h1>
-      <form class={formCss} action={BASE_URL}>
+      <form class={formCss} action="/">
         <input type="url" name="origin" placeholder="https://..." />
         <button type="submit">👉👈</button>
       </form>

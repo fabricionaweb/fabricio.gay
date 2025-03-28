@@ -95,7 +95,7 @@ app.get('/', (ctx) => {
   const BASE_URL = process.env.BASE_URL
   const snippet = `javascript:(()=>{window.open('${BASE_URL}/?origin='+encodeURIComponent(window.location),'_blank')})()`
 
-  if (origin) {
+  if (origin && /^https?:\/\//i.test(origin)) {
     const data = getUrlByUrl(origin) ?? addUrl(origin)
     return ctx.text(`${BASE_URL}/${toShortId(data.id)}`, 201)
   }
@@ -169,7 +169,15 @@ app.get('/', (ctx) => {
       </a>
       <h1 class={headingCss}>🏳️‍🌈</h1>
       <form class={formCss} action="/">
-        <input type="url" name="origin" placeholder="https://..." />
+        <input
+          type="url"
+          name="origin"
+          placeholder="https://..."
+          title="http or https url"
+          pattern="[hH][tT][tT][pP][sS]?:\/\/.+" // the input pattern spec is horrible
+          value={origin}
+          required
+        />
         <button type="submit">👉👈</button>
       </form>
       <footer>

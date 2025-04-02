@@ -1,0 +1,65 @@
+name: Build-Publish
+
+on:
+  push:
+    paths: ['Dockerfile', '*.json', '*.tsx?', '*.jsx?']
+  workflow_dispatch:
+    inputs:
+      no-cache:
+        description: 'Disable cache'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY_URL: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # https://github.com/docker/metadata-action
+      - name: Docker metadata
+        uses: docker/metadata-action@v5
+        id: metadata
+        with:
+          images: ${{ env.REGISTRY_URL }}/${{ github.repository }}
+          tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{ is_default_branch }}
+            # branch
+            type=ref,event=branch
+            # tag
+            type=ref,event=tag
+            # commit
+            type=sha,prefix=
+
+      # https://github.com/docker/login-action
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # https://github.com/docker/build-push-action
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          provenance: false
+          no-cache: ${{ github.event.inputs.no-cache == 'true' }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ github.repository }}:${{ github.ref_name }}
+          cache-to: type=inline

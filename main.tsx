@@ -23,17 +23,14 @@ db.exec(`
   )`)
 
 // methods
-const addUrl = (origin: string) => {
-  return db.prepare('INSERT INTO wardrobe (url) VALUES (?) RETURNING *').get(origin) as UrlSchema
-}
+const addUrl = (origin: string) =>
+  db.prepare('INSERT INTO wardrobe (url) VALUES (?) RETURNING *').get(origin) as unknown as UrlSchema
 
-const getUrlById = (id: UrlSchema['id']) => {
-  return db.prepare('SELECT * FROM wardrobe WHERE id = ?').get(id) as UrlSchema
-}
+const getUrlById = (id: UrlSchema['id']) =>
+  db.prepare('SELECT * FROM wardrobe WHERE id = ?').get(id) as unknown as UrlSchema
 
-const getUrlByUrl = (url: UrlSchema['url']) => {
-  return db.prepare('SELECT * FROM wardrobe WHERE url = ?').get(url) as UrlSchema
-}
+const getUrlByUrl = (url: UrlSchema['url']) =>
+  db.prepare('SELECT * FROM wardrobe WHERE url = ?').get(url) as unknown as UrlSchema
 
 // helpers
 const toShortId = (id: number) => id.toString(36)
@@ -87,7 +84,8 @@ app.get('/:shortId{[0-9a-z]+}/:raw?', (ctx) => {
   const { shortId, raw } = ctx.req.param()
   const data = getUrlById(fromShortId(shortId))
   if (!data) return ctx.notFound()
-  return !raw ? ctx.redirect(data.url) : ctx.text(data.url)
+  if (raw) return ctx.text(data.url)
+  return ctx.redirect(data.url)
 })
 
 app.get('/', (ctx) => {
@@ -183,7 +181,7 @@ app.get('/', (ctx) => {
       <footer>
         or drag the <a href={snippet}>bookmarklet</a>
       </footer>
-    </Layout>
+    </Layout>,
   )
 })
 

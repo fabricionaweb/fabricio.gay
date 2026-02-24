@@ -19,7 +19,7 @@
     "tsx": "^4.19.3"
   },
   "devDependencies": {
-    "@types/node": "^22.13.14"
+    "@types/node": "^24.13.1"
   },
   "prettier": {
     "printWidth": 120,
